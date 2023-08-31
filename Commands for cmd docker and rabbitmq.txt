@@ -1,0 +1,59 @@
+> docker -v
+проверяем, что докер установлен
+
+> docker pull rabbitmg:3.11.0-management
+скачиваем образ rabbitmq
+
+> docker volume create rabbitmq_data
+создаем volume, внешнее хранилище данных
+
+> docker run -d --hostname rabbitmq --name rabbitmq -p 5672:5672 -p 15672:15672 -v rabbitmq_data:/var/lib/docker/volumes/rabbitmq_data/_data --restart=unless-stopped rabbitmq:3.11.0-management
+возвращает ид контейнера
+
+> docker volume inspect rabbitmq_data
+docker volume create rabbitmq_data - создать том
+docker volume inspect rabbitmq_data - проверить том где он лежит
+
+> docker ps -a
+выводит все созданные контейнеры
+
+> docker exec -it rabbitmq /bin/bash
+подключаемся к контейнеру с rabbitmq
+и внутри контейнера выполняем команды:
+
+root@rabbitmq:/# rabbitmqctl add_user userok p@ssw0rd
+создаем пользователя по имени userok с паролем p@ssw0rd
+
+root@rabbitmq:/# rabbitmqctl set_user_tags userok administrator
+установить пользователя администратором (выдать права администратора)
+
+root@rabbitmq:/# rabbitmqctl set_permissions -p / userok ".*" ".*" ".*"
+выдаем набор разрешений: на чтение, запись и изменений конфигурации
+
+
+Подключаем базу данных PostgreSQL
+> docker run -d --hostname evancel --name evancel -p 5400:5432 -e POSTGRES_USER=userok -e POSTGRES_PASSWORD=p@ssw0rd -e POSTGRES_DB=evancel -v /data:/var/lib/docker/volumes/postgresql/_data --restart=unless-stopped postgres:14.5
+
+-e позволяет указать переменные окружения (enviroment)
+
+на всякий случай ниже команды (по крайней мере у меня так)
+
+docker volume create postgresql - создать том
+
+docker volume inspect postgresql - посмотреть том
+
+если вы уже создали образ с не правильным портом то 
+
+docker ps -a - проверить какие образы есть и скопировать ID того образа который хотите удалить
+
+docker stop 044ae91f1cea - остановить не корректный образ (044ae91f1cea это мой ID у Вас будет свой)
+
+docker rm 044ae91f1cea - удалить нужный образ по ID
+
+docker ps -a - проверить что точно удалили
+
+теперь можно запускать по новой с новым портом
+
+
+
+
