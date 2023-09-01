@@ -15,7 +15,7 @@ import pro.sky.dao.BinaryContentDAO;
 import pro.sky.entity.AppDocument;
 import pro.sky.entity.AppPhoto;
 import pro.sky.entity.BinaryContent;
-import pro.sky.service.enums.LinkType;
+import pro.sky.enums.LinkType;
 import pro.sky.exception.UploadFileException;
 import pro.sky.service.FileService;
 

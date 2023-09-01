@@ -1,10 +1,11 @@
-package pro.sky.service.enums;
+package pro.sky.enums;
 
 public enum ServiceCommands {
     HELP("/help"),
     REGISTRATION("/registration"),
     CANCEL("/cancel"),
-    START("/start");
+    START("/start"),
+    TO_SET_A_TASK_FOR_SCHEDULER("/task");
 
     private final String value;
 

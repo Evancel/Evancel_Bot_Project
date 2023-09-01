@@ -1,4 +1,4 @@
-package pro.sky.service.enums;
+package pro.sky.enums;
 
 public enum LinkType {
     GET_DOC("file/get-doc"),
