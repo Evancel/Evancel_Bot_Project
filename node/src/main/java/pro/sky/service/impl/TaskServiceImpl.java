@@ -2,6 +2,7 @@ package pro.sky.service.impl;
 
 import lombok.extern.log4j.Log4j;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.meta.api.objects.Update;
 import pro.sky.dao.AppTaskDAO;
 import pro.sky.dao.AppUserDAO;
 import pro.sky.entity.AppTask;
@@ -11,6 +12,7 @@ import pro.sky.service.TaskService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,7 +35,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public String setTask(AppUser appUser, String text) {
+    public String setTask(AppUser appUser, Long chatId, String text) {
         Pattern pattern = Pattern.compile("([0-9\\.\\:\\s]{16})(\\s)(([a-z A-Z0-9_+]+)||([\\W+]+))");
         Matcher matcher = pattern.matcher(text);
         if (matcher.matches()) {
@@ -44,6 +46,7 @@ public class TaskServiceImpl implements TaskService {
                     DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
 
             AppTask appTask = AppTask.builder()
+                    .chatId(chatId)
                     .dateTime(datetime)
                     .task(task)
                     .build();

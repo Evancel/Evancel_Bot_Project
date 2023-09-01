@@ -2,22 +2,22 @@ package pro.sky.service.impl;
 
 
 import lombok.extern.log4j.Log4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
+import pro.sky.dao.AppTaskDAO;
 import pro.sky.dao.AppUserDAO;
 import pro.sky.dao.RawDataDAO;
-import pro.sky.entity.AppDocument;
-import pro.sky.entity.AppPhoto;
-import pro.sky.entity.AppUser;
-import pro.sky.entity.RawData;
+import pro.sky.entity.*;
 import pro.sky.enums.UserState;
 import pro.sky.exception.UploadFileException;
 import pro.sky.enums.LinkType;
 import pro.sky.enums.ServiceCommands;
 import pro.sky.service.*;
 
+import java.util.List;
 import java.util.Optional;
 
 import static pro.sky.enums.UserState.*;
@@ -29,14 +29,16 @@ public class MainServiceImpl implements MainService {
     private final RawDataDAO rawDataDAO;
     private final ProducerService producerService;
     private final AppUserDAO appUserDAO;
+    private final AppTaskDAO appTaskDAO;
     private final FileService fileService;
     private final AppUserService appUserService;
     private final TaskService taskService;
 
-    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, FileService fileService, AppUserService appUserService, TaskService taskService) {
+    public MainServiceImpl(RawDataDAO rawDataDAO, ProducerService producerService, AppUserDAO appUserDAO, AppTaskDAO appTaskDAO, FileService fileService, AppUserService appUserService, TaskService taskService) {
         this.rawDataDAO = rawDataDAO;
         this.producerService = producerService;
         this.appUserDAO = appUserDAO;
+        this.appTaskDAO = appTaskDAO;
         this.fileService = fileService;
         this.appUserService = appUserService;
         this.taskService = taskService;
@@ -60,7 +62,7 @@ public class MainServiceImpl implements MainService {
         } else if (WAIT_FOR_EMAIL_STATE.equals(userState)) {
             output = appUserService.setEmail(appUser,text);
         } else if (WAIT_FOR_TASK_STATE.equals(userState)) {
-            output = taskService.setTask(appUser, text);
+            output = taskService.setTask(appUser, update.getMessage().getChatId(), text);
         } else{
             log.error("Unknown user state: " + userState);
             output = "Unknown error. Input /cancel and try again!";
@@ -114,6 +116,16 @@ public class MainServiceImpl implements MainService {
             String error= "Sorry, the photo upload failed. Please try again later.";
             sendAnswer(error,chatId);
         }
+    }
+
+    @Scheduled(cron = "0 0/1 * * * *")
+    public void remindAboutCurrentTasks() {
+        List<AppTask> currentTasks = appTaskDAO.findAllTasks();
+
+        currentTasks.forEach(task->{
+                    sendAnswer(task.getTask(), task.getChatId());
+                }
+        );
     }
 
     private void saveRawData(Update update) {

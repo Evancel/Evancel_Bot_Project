@@ -7,4 +7,5 @@ public interface MainService {
     void processTextMessages(Update update);
     void processPhotoMessages(Update update);
     void processDocMessages(Update update);
+    void remindAboutCurrentTasks();
 }

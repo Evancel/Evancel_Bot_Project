@@ -17,6 +17,7 @@ public class AppTask {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Long chatId;
     private String task;
     private LocalDateTime dateTime;
 }
