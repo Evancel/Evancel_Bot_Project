@@ -17,8 +17,11 @@ import pro.sky.enums.LinkType;
 import pro.sky.enums.ServiceCommands;
 import pro.sky.service.*;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static pro.sky.enums.UserState.*;
 import static pro.sky.enums.ServiceCommands.*;
@@ -118,10 +121,12 @@ public class MainServiceImpl implements MainService {
         }
     }
 
+
     @Scheduled(cron = "0 0/1 * * * *")
     public void remindAboutCurrentTasks() {
-        List<AppTask> currentTasks = appTaskDAO.findAllTasks();
-
+        LocalDateTime currentTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES);
+        log.debug("Notification sending time: " + currentTime);
+        List<AppTask> currentTasks = appTaskDAO.findAllByDateTime(currentTime);
         currentTasks.forEach(task->{
                     sendAnswer(task.getTask(), task.getChatId());
                 }
@@ -143,7 +148,7 @@ public class MainServiceImpl implements MainService {
             AppUser transientAppUser = AppUser.builder()
                     .telegramUserId(telegramUser.getId())
                     .firstName(telegramUser.getFirstName())
-                    .lastname(telegramUser.getLastName())
+                    .lastName(telegramUser.getLastName())
                     .userName(telegramUser.getUserName())
                     .isActive(false)
                     .state(BASIC_STATE)

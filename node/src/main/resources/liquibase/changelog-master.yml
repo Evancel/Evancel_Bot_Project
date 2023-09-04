@@ -1,0 +1,16 @@
+databaseChangeLog:
+
+  - include:
+      file: liquibase/scripts/create-app_user-table.sql
+  - include:
+      file: liquibase/scripts/create-app_document-table.sql
+  - include:
+      file: liquibase/scripts/create-app_photo-table.sql
+  - include:
+      file: liquibase/scripts/create-binary_content-table.sql
+  - include:
+      file: liquibase/scripts/create-app_task-table.sql
+  - include:
+      file: liquibase/scripts/create-raw_data-table.sql
+  - include:
+      file: liquibase/scripts/create-index-email-app_user-table.sql
